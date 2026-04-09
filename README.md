@@ -57,6 +57,7 @@ Copy–paste ini:
 pkg update -y && pkg install -y curl jq wget tmux && \
 wget -O install-bot-wa.sh https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh && \
 sed -i 's|/root|$HOME|g' install-bot-wa.sh && \
+sed -i 's|/root/bot-wa|$HOME/bot-wa|g' install-bot-wa.sh && \
 sed -i '/systemctl/d' install-bot-wa.sh && \
 sed -i 's|apt |pkg |g' install-bot-wa.sh && \
 sed -i 's|/bin/bash|/data/data/com.termux/files/usr/bin/bash|g' install-bot-wa.sh && \
