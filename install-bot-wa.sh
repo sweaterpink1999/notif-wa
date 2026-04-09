@@ -1,43 +1,43 @@
-#!/bin/bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 clear
 echo "================================="
-echo " AUTO INSTALL BOT (ANTI STUCK) "
+echo " AUTO INSTALL BOT TERMUX 🔥 "
 echo "================================="
 
-# AUTO ISI (NO INPUT LAGI)
+# AUTO ISI
 TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
 CHAT_ID="1386780002"
 FONNTE="odCdkwttceRZM4VdaPti"
 
 echo "[INFO] Install dependency..."
-apt update -y >/dev/null 2>&1
-apt install -y jq curl >/dev/null 2>&1
+pkg update -y >/dev/null 2>&1
+pkg install -y jq curl >/dev/null 2>&1
 
 echo "[INFO] Setup bot..."
 
-mkdir -p /root/bot-wa
-touch /root/bot-wa/datauser.txt
+mkdir -p $HOME/bot-wa
+touch $HOME/bot-wa/datauser.txt
 
-cat > /root/bot-wa/bot.sh << 'EOF'
-#!/bin/bash
+cat > $HOME/bot-wa/bot.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
 
 TOKEN="__TOKEN__"
 CHAT_ID="__CHAT_ID__"
 FONNTE="__FONNTE__"
-DATA="/root/bot-wa/datauser.txt"
+DATA="$HOME/bot-wa/datauser.txt"
 
 send_tg() {
 curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
 -d chat_id="$CHAT_ID" \
--d text="$1" > /dev/null
+-d text="$1"
 }
 
 send_wa() {
 curl -s -X POST "https://api.fonnte.com/send" \
 -H "Authorization: $FONNTE" \
 -d "target=$1" \
--d "message=$2" > /dev/null
+-d "message=$2"
 }
 
 handle_command() {
@@ -58,8 +58,7 @@ if [[ $msg == /hapus* ]]; then
 fi
 
 if [[ $msg == /list ]]; then
-  list=$(cat $DATA)
-  send_tg "DATA:\n$list"
+  send_tg "$(cat $DATA)"
 fi
 }
 
@@ -91,7 +90,9 @@ while true; do
     sleep 3600
   fi
 
-  response=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
+  response=$(curl -s --max-time 10 "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
+
+  [[ -z "$response" ]] && sleep 5 && continue
 
   update_id=$(echo "$response" | jq '.result[-1].update_id')
   message=$(echo "$response" | jq -r '.result[-1].message.text')
@@ -101,38 +102,21 @@ while true; do
     handle_command "$message"
   fi
 
-  sleep 5
+  sleep 3
 done
 EOF
 
 # inject token
-sed -i "s|__TOKEN__|$TOKEN|g" /root/bot-wa/bot.sh
-sed -i "s|__CHAT_ID__|$CHAT_ID|g" /root/bot-wa/bot.sh
-sed -i "s|__FONNTE__|$FONNTE|g" /root/bot-wa/bot.sh
+sed -i "s|__TOKEN__|$TOKEN|g" $HOME/bot-wa/bot.sh
+sed -i "s|__CHAT_ID__|$CHAT_ID|g" $HOME/bot-wa/bot.sh
+sed -i "s|__FONNTE__|$FONNTE|g" $HOME/bot-wa/bot.sh
 
-chmod +x /root/bot-wa/bot.sh
-
-echo "[INFO] Setup service..."
-
-cat > /etc/systemd/system/bot-wa.service <<EOF
-[Unit]
-Description=Bot WA Fast
-After=network.target
-
-[Service]
-ExecStart=/bin/bash /root/bot-wa/bot.sh
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-systemctl enable bot-wa
-systemctl restart bot-wa
+chmod +x $HOME/bot-wa/bot.sh
 
 echo ""
 echo "================================="
-echo " INSTALL SELESAI 🔥"
+echo " INSTALL SELESAI ✅"
 echo "================================="
+echo ""
+echo "Jalankan bot dengan:"
+echo "bash $HOME/bot-wa/bot.sh"
