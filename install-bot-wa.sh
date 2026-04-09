@@ -5,18 +5,14 @@ echo "================================="
 echo " AUTO INSTALL BOT (ANTI STUCK) "
 echo "================================="
 
-TOKEN="$1"
-CHAT_ID="$2"
-FONNTE="$3"
+# AUTO ISI (NO INPUT LAGI)
+TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
+CHAT_ID="1386780002"
+FONNTE="odCdkwttceRZM4VdaPti"
 
-if [[ -z "$TOKEN" || -z "$CHAT_ID" || -z "$FONNTE" ]]; then
-  echo ""
-  echo "❌ Cara pakai salah!"
-  echo ""
-  echo "Gunakan:"
-  echo "bash install-bot-wa.sh TOKEN CHAT_ID TOKEN_FONNTE"
-  exit 1
-fi
+echo "[INFO] Install dependency..."
+apt update -y >/dev/null 2>&1
+apt install -y jq curl >/dev/null 2>&1
 
 echo "[INFO] Setup bot..."
 
@@ -32,13 +28,13 @@ FONNTE="__FONNTE__"
 DATA="/root/bot-wa/datauser.txt"
 
 send_tg() {
-curl -s -X POST https://api.telegram.org/bot$TOKEN/sendMessage \
--d chat_id=$CHAT_ID \
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+-d chat_id="$CHAT_ID" \
 -d text="$1" > /dev/null
 }
 
 send_wa() {
-curl -s -X POST https://api.fonnte.com/send \
+curl -s -X POST "https://api.fonnte.com/send" \
 -H "Authorization: $FONNTE" \
 -d "target=$1" \
 -d "message=$2" > /dev/null
@@ -96,6 +92,7 @@ while true; do
   fi
 
   response=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
+
   update_id=$(echo "$response" | jq '.result[-1].update_id')
   message=$(echo "$response" | jq -r '.result[-1].message.text')
 
@@ -125,6 +122,7 @@ After=network.target
 [Service]
 ExecStart=/bin/bash /root/bot-wa/bot.sh
 Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
