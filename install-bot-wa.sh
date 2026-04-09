@@ -2,12 +2,21 @@
 
 clear
 echo "================================="
-echo " AUTO INSTALL BOT (NO APT) "
+echo " AUTO INSTALL BOT (ANTI STUCK) "
 echo "================================="
 
-read -p "TOKEN TELEGRAM: " TOKEN
-read -p "CHAT ID TELEGRAM: " CHAT_ID
-read -p "TOKEN FONNTE: " FONNTE
+TOKEN="$1"
+CHAT_ID="$2"
+FONNTE="$3"
+
+if [[ -z "$TOKEN" || -z "$CHAT_ID" || -z "$FONNTE" ]]; then
+  echo ""
+  echo "❌ Cara pakai salah!"
+  echo ""
+  echo "Gunakan:"
+  echo "bash install-bot-wa.sh TOKEN CHAT_ID TOKEN_FONNTE"
+  exit 1
+fi
 
 echo "[INFO] Setup bot..."
 
@@ -127,5 +136,5 @@ systemctl restart bot-wa
 
 echo ""
 echo "================================="
-echo " INSTALL SELESAI ⚡"
+echo " INSTALL SELESAI 🔥"
 echo "================================="
