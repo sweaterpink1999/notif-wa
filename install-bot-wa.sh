@@ -1,179 +1,126 @@
+
+
 #!/data/data/com.termux/files/usr/bin/bash
 
-# ================= CONFIG =================
+clear
+echo "================================="
+echo " INSTALL BOT WA TERMUX 🔥"
+echo " ANTI SPAM VERSION"
+echo "================================="
+
+# ====== CONFIG ======
 TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
 CHAT_ID="1386780002"
 FONNTE="odCdkwttceRZM4VdaPti"
 
+# ====== DEPENDENCY ======
+echo "[INFO] Install dependency..."
+pkg update -y >/dev/null 2>&1
+pkg install -y curl jq tmux >/dev/null 2>&1
+
+# ====== CLEAN OLD ======
+echo "[INFO] Cleaning old data..."
+rm -f $HOME/offset.txt
+rm -f $HOME/datauser.txt
+
+# ====== RESET TELEGRAM UPDATE (ANTI SPAM) ======
+echo "[INFO] Reset Telegram updates..."
+curl -s "https://api.telegram.org/bot$TOKEN/getUpdates" > /dev/null
+sleep 1
+curl -s "https://api.telegram.org/bot$TOKEN/getUpdates" > /dev/null
+
+# ====== SETUP FILE ======
+touch $HOME/datauser.txt
+touch $HOME/offset.txt
+
+# ambil offset terbaru
+LAST=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates" | jq '.result[-1].update_id // 0')
+OFFSET=$((LAST+1))
+echo $OFFSET > $HOME/offset.txt
+
+# ====== BUAT BOT ======
+cat > $HOME/bot-wa.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+
+TOKEN="__TOKEN__"
+CHAT_ID="__CHAT_ID__"
+FONNTE="__FONNTE__"
+
 DATA="$HOME/datauser.txt"
-STATE="$HOME/state.txt"
-OFFSET_FILE="$HOME/offset.txt"
-
-touch "$DATA" "$STATE" "$OFFSET_FILE"
-
-# default offset kalau kosong
-[[ ! -s "$OFFSET_FILE" ]] && echo "0" > "$OFFSET_FILE"
-
-# ================= FUNCTION =================
+OFFSET="$HOME/offset.txt"
 
 send_tg() {
-curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
--d chat_id="$CHAT_ID" \
---data-urlencode text="$1" > /dev/null
-}
-
-send_menu() {
-curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
--d chat_id="$CHAT_ID" \
---data-urlencode text="🤖 MENU BOT
-
-➕ Tambah
-📋 List
-📤 Kirim
-❌ Hapus" \
--d reply_markup='{
-  "keyboard":[
-    ["➕ Tambah","📋 List"],
-    ["📤 Kirim","❌ Hapus"]
-  ],
-  "resize_keyboard":true
-}' > /dev/null
+curl -s -X POST https://api.telegram.org/bot$TOKEN/sendMessage \
+-d chat_id=$CHAT_ID \
+-d text="$1" > /dev/null
 }
 
 send_wa() {
-curl -s -X POST "https://api.fonnte.com/send" \
+curl -s -X POST https://api.fonnte.com/send \
 -H "Authorization: $FONNTE" \
 -d "target=$1" \
---data-urlencode "message=$2" > /dev/null
+-d "message=$2" > /dev/null
 }
 
-set_state() { echo "$1" > "$STATE"; }
-get_state() { cat "$STATE" 2>/dev/null; }
-
-# ================= COMMAND =================
-
-handle_command() {
+handle() {
 msg="$1"
-state=$(get_state)
 
 [[ -z "$msg" ]] && return
 
-# START
-if [[ "$msg" == "/start" ]]; then
-  send_menu
-  set_state "idle"
-  return
+if [[ $msg == /start ]]; then
+send_tg "🤖 BOT AKTIF"
 fi
 
-# TAMBAH
-if [[ "$msg" == "➕ Tambah" ]]; then
-  send_tg "Masukkan nama:"
-  set_state "nama"
-  return
+if [[ $msg == /tambah* ]]; then
+echo "$msg" | awk '{print $2,$3,$4}' >> $DATA
+send_tg "✅ Ditambahkan"
 fi
 
-if [[ "$state" == "nama" ]]; then
-  echo "$msg" > "$HOME/nama"
-  send_tg "Masukkan nomor (contoh 628xxx):"
-  set_state "nomor"
-  return
+if [[ $msg == /list ]]; then
+send_tg "$(cat $DATA)"
 fi
 
-if [[ "$state" == "nomor" ]]; then
-  echo "$msg" > "$HOME/nomor"
-  send_tg "Masukkan tanggal (YYYY-MM-DD):"
-  set_state "exp"
-  return
+if [[ $msg == /kirim* ]]; then
+text=$(echo "$msg" | cut -d' ' -f2-)
+while read u w e; do
+send_wa "$w" "$text"
+done < $DATA
+send_tg "✅ Terkirim"
 fi
-
-if [[ "$state" == "exp" ]]; then
-  nama=$(cat "$HOME/nama")
-  nomor=$(cat "$HOME/nomor")
-
-  [[ -z "$nama" || -z "$nomor" ]] && send_tg "❌ Data tidak valid" && set_state "idle" && return
-
-  echo "$nama $nomor $msg" >> "$DATA"
-  send_tg "✅ Ditambahkan: $nama ($nomor)"
-  set_state "idle"
-  return
-fi
-
-# LIST
-if [[ "$msg" == "📋 List" ]]; then
-  if [[ ! -s "$DATA" ]]; then
-    send_tg "📭 Data kosong"
-    return
-  fi
-
-  text="📋 DATA:"
-  while read -r u w e; do
-    text="$text\n$u | $w | $e"
-  done < "$DATA"
-
-  send_tg "$text"
-  return
-fi
-
-# KIRIM
-if [[ "$msg" == "📤 Kirim" ]]; then
-  send_tg "Masukkan pesan:"
-  set_state "kirim"
-  return
-fi
-
-if [[ "$state" == "kirim" ]]; then
-  jumlah=0
-
-  while read -r u w e; do
-    [[ -z "$w" ]] && continue
-
-    send_wa "$w" "$msg"
-    jumlah=$((jumlah+1))
-    sleep 1
-  done < "$DATA"
-
-  send_tg "✅ Terkirim ke $jumlah user"
-  set_state "idle"
-  return
-fi
-
-# HAPUS
-if [[ "$msg" == "❌ Hapus" ]]; then
-  send_tg "Masukkan nomor:"
-  set_state "hapus"
-  return
-fi
-
-if [[ "$state" == "hapus" ]]; then
-  sed -i "/$msg/d" "$DATA"
-  send_tg "❌ Dihapus"
-  set_state "idle"
-  return
-fi
-
 }
 
-# ================= LOOP =================
-
-last_update=$(cat "$OFFSET_FILE")
+offset=$(cat $OFFSET)
 
 while true; do
-  response=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
+res=$(curl -s https://api.telegram.org/bot$TOKEN/getUpdates?offset=$offset)
 
-  echo "$response" | jq -c '.result[]?' 2>/dev/null | while read -r update; do
-    update_id=$(echo "$update" | jq '.update_id')
-    message=$(echo "$update" | jq -r '.message.text // empty')
+echo "$res" | jq -c '.result[]?' | while read u; do
+id=$(echo "$u" | jq '.update_id')
+msg=$(echo "$u" | jq -r '.message.text // empty')
 
-    [[ -z "$message" ]] && continue
+[[ -z "$msg" ]] && continue
 
-    last_update=$((update_id+1))
-    echo "$last_update" > "$OFFSET_FILE"
+offset=$((id+1))
+echo $offset > $OFFSET
 
-    handle_command "$message"
-  done
+handle "$msg"
+done
 
-  sleep 2
+sleep 2
 done
 EOF
 
+# inject token
+sed -i "s|__TOKEN__|$TOKEN|g" $HOME/bot-wa.sh
+sed -i "s|__CHAT_ID__|$CHAT_ID|g" $HOME/bot-wa.sh
+sed -i "s|__FONNTE__|$FONNTE|g" $HOME/bot-wa.sh
+
 chmod +x $HOME/bot-wa.sh
+
+echo ""
+echo "================================="
+echo " INSTALL SELESAI ✅"
+echo "================================="
+echo ""
+echo "Jalankan bot:"
+echo "bash ~/bot-wa.sh"
