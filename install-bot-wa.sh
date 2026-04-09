@@ -1,11 +1,8 @@
-# 🤖 BOT TERMUX FINAL + TOMBOL (TINGGAL PASTE)
-
-```bash
 #!/data/data/com.termux/files/usr/bin/bash
 
 clear
 echo "================================="
-echo " BOT TERMUX + MENU 🔥 "
+echo " BOT TERMUX STABLE + MENU 🔥 "
 echo "================================="
 
 # CONFIG
@@ -33,6 +30,19 @@ curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
 -d text="$1" > /dev/null
 }
 
+send_menu() {
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+-d chat_id="$CHAT_ID" \
+-d text="🤖 MENU BOT\nPilih menu:" \
+-d reply_markup='{
+  "keyboard":[
+    ["➕ Tambah","📋 List"],
+    ["📤 Kirim","❌ Hapus"]
+  ],
+  "resize_keyboard":true
+}' > /dev/null
+}
+
 send_wa() {
 curl -s -X POST "https://api.fonnte.com/send" \
 -H "Authorization: $FONNTE" \
@@ -43,41 +53,29 @@ curl -s -X POST "https://api.fonnte.com/send" \
 handle_command() {
 msg="$1"
 
-# 🔥 MENU /START
+# START MENU
 if [[ "$msg" == "/start" ]]; then
-curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
--d chat_id="$CHAT_ID" \
--d text="🤖 MENU BOT\nPilih salah satu:" \
--d reply_markup='{
-  "keyboard":[
-    ["➕ Tambah","📋 List"],
-    ["📤 Kirim","❌ Hapus"]
-  ],
-  "resize_keyboard":true
-}'
+  send_menu
 fi
 
-# TOMBOL LIST
+# TOMBOL
 if [[ "$msg" == "📋 List" ]]; then
   send_tg "$(cat $DATA)"
 fi
 
-# TOMBOL KIRIM
 if [[ "$msg" == "📤 Kirim" ]]; then
   send_tg "Gunakan:\n/kirim nama nomor pesan"
 fi
 
-# TOMBOL TAMBAH
 if [[ "$msg" == "➕ Tambah" ]]; then
   send_tg "Gunakan:\n/tambah nama nomor tanggal"
 fi
 
-# TOMBOL HAPUS
 if [[ "$msg" == "❌ Hapus" ]]; then
   send_tg "Gunakan:\n/hapus nomor"
 fi
 
-# TAMBAH USER
+# TAMBAH
 if [[ $msg == /tambah* ]]; then
   user=$(echo "$msg" | awk '{print $2}')
   wa=$(echo "$msg" | awk '{print $3}')
@@ -86,19 +84,19 @@ if [[ $msg == /tambah* ]]; then
   send_tg "Ditambahkan: $user ($wa)"
 fi
 
-# HAPUS USER
+# HAPUS
 if [[ $msg == /hapus* ]]; then
   wa=$(echo "$msg" | awk '{print $2}')
   sed -i "/$wa/d" $DATA
   send_tg "Dihapus: $wa"
 fi
 
-# LIST USER
+# LIST
 if [[ $msg == /list ]]; then
   send_tg "$(cat $DATA)"
 fi
 
-# 🔥 KIRIM LANGSUNG
+# KIRIM WA
 if [[ $msg == /kirim* ]]; then
   user=$(echo "$msg" | awk '{print $2}')
   wa=$(echo "$msg" | awk '{print $3}')
@@ -116,17 +114,17 @@ last_update=0
 while true; do
   response=$(curl -s --max-time 10 "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
 
-  [[ -z "$response" ]] && sleep 5 && continue
+  echo "$response" | jq -c '.result[]' | while read update; do
+    update_id=$(echo "$update" | jq '.update_id')
+    message=$(echo "$update" | jq -r '.message.text')
 
-  update_id=$(echo "$response" | jq '.result[-1].update_id')
-  message=$(echo "$response" | jq -r '.result[-1].message.text')
+    if [[ "$update_id" != "null" ]]; then
+      last_update=$((update_id+1))
+      handle_command "$message"
+    fi
+  done
 
-  if [[ "$update_id" != "null" ]]; then
-    last_update=$((update_id+1))
-    handle_command "$message"
-  fi
-
-  sleep 3
+  sleep 2
 done
 EOF
 
@@ -139,51 +137,8 @@ chmod +x $HOME/bot-wa/bot.sh
 
 echo ""
 echo "================================="
-echo " INSTALL SELESAI ✅"
+echo " INSTALL SELESAI (STABLE) ✅"
 echo "================================="
 echo ""
-echo "Jalankan bot dengan:"
+echo "Jalankan:"
 echo "bash $HOME/bot-wa/bot.sh"
-```
-
----
-
-# 🚀 CARA JALANKAN
-
-```bash
-bash install-bot-wa.sh
-bash $HOME/bot-wa/bot.sh
-```
-
----
-
-# 🎯 HASIL
-
-Ketik di Telegram:
-
-```
-/start
-```
-
-👉 muncul tombol:
-
-* ➕ Tambah
-* 📋 List
-* 📤 Kirim
-* ❌ Hapus
-
----
-
-# 🔥 FITUR
-
-✔ Tombol menu
-✔ Kirim WA langsung
-✔ Tidak perlu ketik semua command
-✔ Simple & ringan
-
----
-
-# 👨‍💻 AUTHOR
-
-By: kamu 😎
-Upgrade: versi tombol 🔥
