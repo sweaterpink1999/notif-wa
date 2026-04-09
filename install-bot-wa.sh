@@ -1,11 +1,14 @@
+# 🤖 BOT TERMUX FINAL + TOMBOL (TINGGAL PASTE)
+
+```bash
 #!/data/data/com.termux/files/usr/bin/bash
 
 clear
 echo "================================="
-echo " BOT TERMUX FINAL 🔥 "
+echo " BOT TERMUX + MENU 🔥 "
 echo "================================="
 
-# CONFIG (TOKEN KAMU)
+# CONFIG
 TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
 CHAT_ID="1386780002"
 FONNTE="odCdkwttceRZM4VdaPti"
@@ -39,6 +42,40 @@ curl -s -X POST "https://api.fonnte.com/send" \
 
 handle_command() {
 msg="$1"
+
+# 🔥 MENU /START
+if [[ "$msg" == "/start" ]]; then
+curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+-d chat_id="$CHAT_ID" \
+-d text="🤖 MENU BOT\nPilih salah satu:" \
+-d reply_markup='{
+  "keyboard":[
+    ["➕ Tambah","📋 List"],
+    ["📤 Kirim","❌ Hapus"]
+  ],
+  "resize_keyboard":true
+}'
+fi
+
+# TOMBOL LIST
+if [[ "$msg" == "📋 List" ]]; then
+  send_tg "$(cat $DATA)"
+fi
+
+# TOMBOL KIRIM
+if [[ "$msg" == "📤 Kirim" ]]; then
+  send_tg "Gunakan:\n/kirim nama nomor pesan"
+fi
+
+# TOMBOL TAMBAH
+if [[ "$msg" == "➕ Tambah" ]]; then
+  send_tg "Gunakan:\n/tambah nama nomor tanggal"
+fi
+
+# TOMBOL HAPUS
+if [[ "$msg" == "❌ Hapus" ]]; then
+  send_tg "Gunakan:\n/hapus nomor"
+fi
 
 # TAMBAH USER
 if [[ $msg == /tambah* ]]; then
@@ -107,3 +144,46 @@ echo "================================="
 echo ""
 echo "Jalankan bot dengan:"
 echo "bash $HOME/bot-wa/bot.sh"
+```
+
+---
+
+# 🚀 CARA JALANKAN
+
+```bash
+bash install-bot-wa.sh
+bash $HOME/bot-wa/bot.sh
+```
+
+---
+
+# 🎯 HASIL
+
+Ketik di Telegram:
+
+```
+/start
+```
+
+👉 muncul tombol:
+
+* ➕ Tambah
+* 📋 List
+* 📤 Kirim
+* ❌ Hapus
+
+---
+
+# 🔥 FITUR
+
+✔ Tombol menu
+✔ Kirim WA langsung
+✔ Tidak perlu ketik semua command
+✔ Simple & ringan
+
+---
+
+# 👨‍💻 AUTHOR
+
+By: kamu 😎
+Upgrade: versi tombol 🔥
