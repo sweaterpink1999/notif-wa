@@ -2,15 +2,14 @@
 
 clear
 echo "================================="
-echo " AUTO INSTALL BOT TAGIHAN PRO "
+echo " AUTO INSTALL BOT (NO APT) "
 echo "================================="
-
-apt update -y
-apt install curl jq nano -y
 
 read -p "TOKEN TELEGRAM: " TOKEN
 read -p "CHAT ID TELEGRAM: " CHAT_ID
 read -p "TOKEN FONNTE: " FONNTE
+
+echo "[INFO] Setup bot..."
 
 mkdir -p /root/bot-wa
 touch /root/bot-wa/datauser.txt
@@ -44,18 +43,18 @@ if [[ $msg == /tambah* ]]; then
   wa=$(echo "$msg" | awk '{print $3}')
   exp=$(echo "$msg" | awk '{print $4}')
   echo "$user $wa $exp" >> $DATA
-  send_tg "Ditambahkan: $user ($wa) exp $exp"
+  send_tg "Ditambahkan: $user ($wa)"
 fi
 
 if [[ $msg == /hapus* ]]; then
   wa=$(echo "$msg" | awk '{print $2}')
   sed -i "/$wa/d" $DATA
-  send_tg "Dihapus nomor: $wa"
+  send_tg "Dihapus: $wa"
 fi
 
 if [[ $msg == /list ]]; then
   list=$(cat $DATA)
-  send_tg "DATA USER:\n$list"
+  send_tg "DATA:\n$list"
 fi
 }
 
@@ -66,13 +65,12 @@ while read user wa exp; do
   [[ -z "$user" ]] && continue
 
   if [[ "$exp" == "$today" ]]; then
-    send_wa "$wa" "Halo $user, akun kamu hari ini expired. Silahkan perpanjang"
-    send_tg "WA terkirim ke $user ($wa)"
+    send_wa "$wa" "Halo $user, akun kamu expired hari ini"
+    send_tg "Kirim ke $user"
   fi
 
   if [[ "$exp" < "$today" ]]; then
     sed -i "/$wa/d" $DATA
-    send_tg "Dihapus expired: $user ($wa)"
   fi
 
 done < $DATA
@@ -101,16 +99,18 @@ while true; do
 done
 EOF
 
-# Replace placeholder dengan input
+# inject token
 sed -i "s|__TOKEN__|$TOKEN|g" /root/bot-wa/bot.sh
 sed -i "s|__CHAT_ID__|$CHAT_ID|g" /root/bot-wa/bot.sh
 sed -i "s|__FONNTE__|$FONNTE|g" /root/bot-wa/bot.sh
 
 chmod +x /root/bot-wa/bot.sh
 
+echo "[INFO] Setup service..."
+
 cat > /etc/systemd/system/bot-wa.service <<EOF
 [Unit]
-Description=Bot WA Pro
+Description=Bot WA Fast
 After=network.target
 
 [Service]
@@ -126,4 +126,6 @@ systemctl enable bot-wa
 systemctl restart bot-wa
 
 echo ""
-echo "INSTALL SELESAI"
+echo "================================="
+echo " INSTALL SELESAI ⚡"
+echo "================================="
