@@ -1,37 +1,3 @@
-
-
-#!/data/data/com.termux/files/usr/bin/bash
-
-clear
-echo "================================="
-echo " INSTALL BOT WA TERMUX 🔥 FINAL"
-echo "================================="
-
-# ====== CONFIG ======
-TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
-CHAT_ID="1386780002"
-FONNTE="odCdkwttceRZM4VdaPti"
-
-# ====== DEPENDENCY ======
-echo "[INFO] Install dependency..."
-pkg update -y >/dev/null 2>&1
-pkg install -y curl jq tmux >/dev/null 2>&1
-
-# ====== CLEAN ======
-rm -f $HOME/offset.txt
-rm -f $HOME/datauser.txt
-rm -f $HOME/state.txt
-
-# ====== RESET TELEGRAM ======
-curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=-1" > /dev/null
-
-# ====== FILE ======
-touch $HOME/datauser.txt
-echo "0" > $HOME/offset.txt
-touch $HOME/state.txt
-
-# ====== BOT ======
-cat > $HOME/bot-wa.sh << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
 
 TOKEN="__TOKEN__"
@@ -64,7 +30,7 @@ curl -s -X POST https://api.fonnte.com/send \
 
 handle() {
 msg="$1"
-state=$(cat $STATE_FILE)
+state=$(cat $STATE_FILE 2>/dev/null)
 
 [[ -z "$msg" ]] && return
 
@@ -82,13 +48,14 @@ send_tg "Masukkan nomor & tanggal:
 return
 fi
 
-# ===== INPUT TAMBAH =====
+# ===== INPUT TAMBAH (FIXED) =====
 if [[ "$state" == "tambah" ]]; then
-nomor=$(echo "$msg" | awk '{print $1}')
-exp=$(echo "$msg" | awk '{print $2}')
+IFS=' ' read nomor exp <<< "$msg"
 
 if [[ -z "$nomor" || -z "$exp" ]]; then
-send_tg "Format salah!"
+send_tg "Format salah!
+Contoh:
+628xxx 2026-05-01"
 return
 fi
 
@@ -153,9 +120,22 @@ fi
 offset=$(cat $OFFSET_FILE)
 
 while true; do
+
 res=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$offset")
 
+# ===== FIX JQ ERROR =====
+[[ -z "$res" ]] && sleep 2 && continue
+
+echo "$res" | jq . >/dev/null 2>&1
+if [[ $? -ne 0 ]]; then
+echo "[ERROR] JSON tidak valid"
+sleep 2
+continue
+fi
+
 updates=$(echo "$res" | jq -c '.result[]?')
+
+[[ -z "$updates" ]] && sleep 2 && continue
 
 for u in $updates; do
 id=$(echo "$u" | jq '.update_id')
@@ -173,20 +153,3 @@ done
 
 sleep 2
 done
-EOF
-
-# inject
-sed -i "s|__TOKEN__|$TOKEN|g" $HOME/bot-wa.sh
-sed -i "s|__CHAT_ID__|$CHAT_ID|g" $HOME/bot-wa.sh
-sed -i "s|__FONNTE__|$FONNTE|g" $HOME/bot-wa.sh
-
-chmod +x $HOME/bot-wa.sh
-
-echo ""
-echo "================================="
-echo " INSTALL SELESAI ✅"
-echo "================================="
-echo ""
-echo "Jalankan:"
-echo "tmux"
-echo "while true; do bash ~/bot-wa.sh; sleep 3; done"
