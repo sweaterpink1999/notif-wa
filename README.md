@@ -1,27 +1,26 @@
-# 🤖 BOT TAGIHAN WA + TELEGRAM (TERMUX VERSION)
+# 🤖 BOT WA + TELEGRAM (TERMUX VERSION — ANTI GAGAL)
 
-Bot otomatis untuk:
+Bot untuk:
 
-* Kirim tagihan WhatsApp (via Fonnte)
-* Kontrol via Telegram
-* Auto kirim jam 18:00
-* Auto hapus user expired
-* Jalan di Termux (HP) ✅
+* Kirim WhatsApp via Fonnte
+* Kontrol dari Telegram
+* Jalan di Termux (HP)
+* Stabil & anti error ✅
 
 ---
 
 # 🚀 1. INSTALL TERMUX (WAJIB)
 
-❗ **Jangan pakai Termux dari Play Store**
+❗ **JANGAN pakai Play Store**
 
-Download dari sini:
+Download di sini:
 👉 https://f-droid.org/packages/com.termux/
 
 ---
 
-# ⚙️ 2. SETUP AWAL TERMUX
+# ⚙️ 2. SETUP AWAL (PENTING BANGET)
 
-Buka Termux lalu jalankan:
+Buka Termux lalu:
 
 ```bash
 termux-change-repo
@@ -31,16 +30,16 @@ Pilih:
 
 * ✔ Mirror group
 * ✔ Main repository
-* ✔ Pilih mirror:
+* ✔ Pilih salah satu:
 
-  * Grimler (Singapore) ✅
-  * Cloudflare ✅
+  * Grimler (Singapore) ⭐
+  * Cloudflare
 
-❌ Jangan pilih textcord
+❌ Jangan pilih textcord (error)
 
 ---
 
-# 🔄 3. UPDATE & INSTALL DEPENDENCY
+# 🔄 3. UPDATE & INSTALL
 
 ```bash
 pkg update -y && pkg upgrade -y
@@ -49,24 +48,45 @@ pkg install curl jq wget tmux -y
 
 ---
 
-# 🚀 4. INSTALL BOT (AUTO)
-
-Copy–paste ini:
+# 🔍 4. TEST TERMUX (WAJIB)
 
 ```bash
-pkg update -y && pkg install -y curl jq wget tmux && \
-wget -O install-bot-wa.sh https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh && \
-sed -i 's|/root|$HOME|g' install-bot-wa.sh && \
-sed -i 's|/root/bot-wa|$HOME/bot-wa|g' install-bot-wa.sh && \
-sed -i '/systemctl/d' install-bot-wa.sh && \
-sed -i 's|apt |pkg |g' install-bot-wa.sh && \
-sed -i 's|/bin/bash|/data/data/com.termux/files/usr/bin/bash|g' install-bot-wa.sh && \
+curl https://google.com
+```
+
+👉 Kalau muncul HTML → lanjut
+👉 Kalau error → jangan lanjut (fix dulu)
+
+---
+
+# 🚀 5. INSTALL BOT
+
+```bash
+wget https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh
+```
+
+---
+
+# 🔧 6. FIX UNTUK TERMUX
+
+```bash
+sed -i 's|/root|$HOME|g' install-bot-wa.sh
+sed -i '/systemctl/d' install-bot-wa.sh
+sed -i 's|apt |pkg |g' install-bot-wa.sh
+sed -i 's|/bin/bash|/data/data/com.termux/files/usr/bin/bash|g' install-bot-wa.sh
+```
+
+---
+
+# ▶️ 7. JALANKAN INSTALL
+
+```bash
 bash install-bot-wa.sh
 ```
 
 ---
 
-# ▶️ 5. JALANKAN BOT
+# ▶️ 8. JALANKAN BOT
 
 ```bash
 bash $HOME/bot-wa/bot.sh
@@ -74,20 +94,20 @@ bash $HOME/bot-wa/bot.sh
 
 ---
 
-# 🔥 6. JALANKAN DI BACKGROUND (WAJIB)
+# 🔥 9. JALANKAN DI BACKGROUND
 
 ```bash
 tmux
 bash $HOME/bot-wa/bot.sh
 ```
 
-Keluar tanpa mematikan bot:
+Keluar:
 
 ```
-CTRL + B lalu tekan D
+CTRL + B lalu D
 ```
 
-Masuk kembali:
+Masuk lagi:
 
 ```bash
 tmux attach
@@ -95,113 +115,76 @@ tmux attach
 
 ---
 
-# 🔑 CONFIG
+# 📲 CARA PAKAI
 
-Bot sudah otomatis menggunakan:
-
-* TOKEN TELEGRAM ✅
-* CHAT ID ✅
-* TOKEN FONNTE ✅
-
-(Tidak perlu input manual)
-
----
-
-# 📲 CARA PAKAI BOT
-
-### ➕ Tambah User
+### ➕ Tambah user
 
 ```
 /tambah nama 628xxxx 2026-04-09
 ```
 
-Contoh:
-
-```
-/tambah user1 628123456789 2026-04-09
-```
-
----
-
-### ❌ Hapus User
-
-```
-/hapus 628xxxx
-```
-
----
-
-### 📋 List User
+### 📋 List user
 
 ```
 /list
 ```
 
----
-
-# ⏰ AUTO SYSTEM
-
-Bot akan otomatis:
-
-* Kirim WhatsApp jam **18:00**
-* Hanya kirim jika tanggal sesuai
-* Tidak kirim sebelum waktunya
-* Hapus user jika sudah lewat tanggal
-
----
-
-# 📦 FORMAT DATA
+### ❌ Hapus user
 
 ```
-nama nomor tanggal_expired
+/hapus 628xxxx
 ```
 
-Contoh:
+### 📤 Kirim WA
 
 ```
-user1 628123456789 2026-04-09
+/kirim nama 628xxxx pesan
 ```
 
 ---
 
-# ⚠️ CATATAN PENTING
+# ⚠️ WAJIB DIPERHATIKAN
 
-* Format nomor WA:
+## 1. Format nomor WA
 
 ```
-628xxxx (tanpa 0)
+628xxxx (bukan 08xxxx)
 ```
-
-* Pastikan:
-
-  * Bot Telegram sudah klik **START**
-  * Fonnte dalam kondisi **connected**
 
 ---
 
-# 🔥 FITUR
+## 2. Telegram
 
-* ✔ Kirim WA otomatis
-* ✔ Kontrol via Telegram
-* ✔ Auto delete expired user
-* ✔ Anti stuck (pakai timeout)
-* ✔ Tidak perlu VPS
-* ✔ Jalan di HP (Termux)
+* Harus klik **START**
+* Chat ID harus benar
+
+---
+
+## 3. Fonnte
+
+* Harus **CONNECTED**
+* Token harus valid
 
 ---
 
 # 💥 TROUBLESHOOTING
 
-### Bot tidak respon
+## ❌ Bot tidak respon
 
-* Pastikan sudah klik **START** di Telegram
+✔ belum klik START
+✔ bot tidak jalan
 
-### WA tidak terkirim
+---
 
-* Cek token Fonnte
-* Cek nomor format 628xxxx
+## ❌ WA tidak terkirim
 
-### Bot berhenti
+✔ nomor salah
+✔ Fonnte offline
+✔ token salah
+
+---
+
+## ❌ Bot berhenti
 
 Jalankan ulang:
 
@@ -211,7 +194,26 @@ bash $HOME/bot-wa/bot.sh
 
 ---
 
+# 🔥 TIPS ANTI GAGAL
+
+✔ Jangan skip step
+✔ Selalu test `curl google` dulu
+✔ Jangan pakai repo textcord
+✔ Pastikan pakai Termux F-Droid
+
+---
+
+# 🚀 STATUS AKHIR
+
+Kalau berhasil:
+
+* Bot jalan terus
+* Telegram respon
+* WA bisa terkirim
+
+---
+
 # 👨‍💻 AUTHOR
 
-By: kamu sendiri 😎
-Upgrade: Termux Version Anti Stuck 🔥
+By: kamu 😎
+Upgrade: Anti Gagal Version 🔥
