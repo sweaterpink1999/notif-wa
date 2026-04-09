@@ -1,4 +1,4 @@
-# 🤖 BOT WA + TELEGRAM (TERMUX VERSION — ANTI GAGAL)
+# 🤖 BOT WA + TELEGRAM (TERMUX VERSION — STABLE)
 
 Bot ini bisa:
 
@@ -9,18 +9,15 @@ Bot ini bisa:
 
 ---
 
-# 🚀 1. INSTALL TERMUX (WAJIB BENAR)
+# 🚀 1. INSTALL TERMUX
 
-❗ Jangan pakai dari Play Store (sering error)
+❗ Gunakan dari F-Droid (WAJIB)
 
-Download dari sini:
-👉 https://f-droid.org/packages/com.termux/
+https://f-droid.org/packages/com.termux/
 
 ---
 
-# ⚙️ 2. SETUP AWAL TERMUX
-
-Buka Termux → jalankan:
+# ⚙️ 2. SETUP TERMUX
 
 ```bash
 termux-change-repo
@@ -28,18 +25,13 @@ termux-change-repo
 
 Pilih:
 
-* ✔ Mirror group
-* ✔ Main repository
-* ✔ Pilih mirror:
-
-  * Grimler (Singapore) ⭐
-  * Cloudflare
-
-❌ Jangan pilih **textcord** (sering error)
+* Mirror group
+* Main repository
+* Grimler / Cloudflare
 
 ---
 
-# 🔄 3. UPDATE & INSTALL DEPENDENCY
+# 🔄 3. INSTALL DEPENDENCY
 
 ```bash
 pkg update -y && pkg upgrade -y
@@ -48,35 +40,18 @@ pkg install curl jq wget tmux -y
 
 ---
 
-# 🔍 4. TEST TERMUX (PENTING BANGET)
+# 🔍 4. TEST INTERNET
 
 ```bash
 curl https://google.com
 ```
 
-### 👉 Kalau hasil seperti ini:
-
-```html
-<HTML><HEAD>...
-```
-
-✔ Artinya: Termux normal → lanjut ✅
+✔ Kalau berhasil → lanjut
+❌ Kalau gagal → jangan lanjut
 
 ---
 
-### ❌ Kalau error seperti ini:
-
-```
-Failed to connect
-Could not resolve host
-```
-
-👉 Artinya: internet / repo bermasalah
-👉 **JANGAN lanjut — perbaiki dulu**
-
----
-
-# 🚀 5. DOWNLOAD SCRIPT BOT
+# 🚀 5. DOWNLOAD SCRIPT
 
 ```bash
 wget https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh
@@ -84,7 +59,7 @@ wget https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot
 
 ---
 
-# 🔧 6. FIX AGAR COMPATIBLE TERMUX
+# 🔧 6. FIX TERMUX
 
 ```bash
 sed -i 's|/root|$HOME|g' install-bot-wa.sh
@@ -101,34 +76,25 @@ sed -i 's|/bin/bash|/data/data/com.termux/files/usr/bin/bash|g' install-bot-wa.s
 bash install-bot-wa.sh
 ```
 
-Kalau berhasil akan muncul:
-
-```
-INSTALL SELESAI
-```
-
 ---
 
 # ▶️ 8. JALANKAN BOT
 
 ```bash
-bash $HOME/bot-wa/bot.sh
+bash $HOME/bot-wa.sh
 ```
 
 ---
 
-# 🔥 9. BIAR BOT TIDAK MATI
+# 🔥 9. AGAR BOT TIDAK MATI
 
 ```bash
 tmux
-bash $HOME/bot-wa/bot.sh
+bash $HOME/bot-wa.sh
 ```
 
-Keluar tanpa mematikan bot:
-
-```
-CTRL + B lalu D
-```
+Keluar:
+CTRL + B → D
 
 Masuk lagi:
 
@@ -138,104 +104,61 @@ tmux attach
 
 ---
 
-# 📲 CARA PAKAI BOT
+# 📲 CARA PAKAI
 
-### ➕ Tambah user
+## ➕ Tambah user
 
-```
-/tambah nama 628xxxx 2026-04-09
-```
-
-### 📋 Lihat data
+Ketik di Telegram:
 
 ```
-/list
+➕ Tambah
 ```
 
-### ❌ Hapus user
+## 📋 List
 
 ```
-/hapus 628xxxx
+📋 List
 ```
 
-### 📤 Kirim WA langsung
+## 📤 Kirim
 
 ```
-/kirim nama 628xxxx pesan
+📤 Kirim
 ```
 
----
-
-# ⚠️ HAL PENTING (SERING SALAH)
-
-## 1. Format nomor WA
+## ❌ Hapus
 
 ```
-628xxxx ❌ benar
-08xxxx  ❌ salah
+❌ Hapus
 ```
 
 ---
 
-## 2. Telegram
+# ⚠️ PENTING
 
-* Wajib klik **START**
-* Chat ID harus benar
-
----
-
-## 3. Fonnte
-
-* Status harus **CONNECTED**
-* Token harus valid
+* Nomor WA wajib format:
+  628xxxx ✅
+* Fonnte harus CONNECTED
+* Klik START di Telegram
 
 ---
 
 # 💥 TROUBLESHOOTING
 
-## ❌ Bot tidak respon
+## Bot tidak respon
 
-* Belum klik START
+* Belum /start
 * Bot belum jalan
 
----
+## WA tidak masuk
 
-## ❌ WA tidak masuk
-
-* Nomor salah (08 bukan 628)
-* Fonnte belum connect
+* Nomor salah
 * Token salah
-
----
-
-## ❌ Bot berhenti
-
-Jalankan ulang:
-
-```bash
-bash $HOME/bot-wa/bot.sh
-```
-
----
-
-# 🔥 TIPS SUPAYA TIDAK GAGAL
-
-✔ Ikuti step dari atas (jangan lompat)
-✔ Selalu test `curl google` dulu
-✔ Jangan pakai repo textcord
-✔ Gunakan Termux dari F-Droid
-
----
-
-# 🚀 HASIL AKHIR (JIKA BERHASIL)
-
-✔ Bot jalan terus
-✔ Telegram bisa kontrol
-✔ WA berhasil terkirim
+* Fonnte belum connect
 
 ---
 
 # 👨‍💻 AUTHOR
 
-By: kamu 😎
-Upgrade: Anti Gagal Version 🔥
+By: sweaterpink1999 😎
+Version: Stable Termux 🔥
