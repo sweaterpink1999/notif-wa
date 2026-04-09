@@ -1,24 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-clear
-echo "================================="
-echo " BOT TERMUX STABLE + MENU 🔥 "
-echo "================================="
-
-# CONFIG
-TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
-CHAT_ID="1386780002"
-FONNTE="odCdkwttceRZM4VdaPti"
-
-pkg update -y >/dev/null 2>&1
-pkg install -y jq curl >/dev/null 2>&1
-
-mkdir -p $HOME/bot-wa
-touch $HOME/bot-wa/datauser.txt
-
-cat > $HOME/bot-wa/bot.sh << 'EOF'
-#!/data/data/com.termux/files/usr/bin/bash
-
 TOKEN="__TOKEN__"
 CHAT_ID="__CHAT_ID__"
 FONNTE="__FONNTE__"
@@ -53,26 +34,26 @@ curl -s -X POST "https://api.fonnte.com/send" \
 handle_command() {
 msg="$1"
 
-# START MENU
+# START
 if [[ "$msg" == "/start" ]]; then
   send_menu
 fi
 
-# TOMBOL
+# MENU BUTTON
 if [[ "$msg" == "📋 List" ]]; then
   send_tg "$(cat $DATA)"
 fi
 
-if [[ "$msg" == "📤 Kirim" ]]; then
-  send_tg "Gunakan:\n/kirim nama nomor pesan"
-fi
-
 if [[ "$msg" == "➕ Tambah" ]]; then
-  send_tg "Gunakan:\n/tambah nama nomor tanggal"
+  send_tg "Gunakan:\n/tambah nama nomor tanggal(YYYY-MM-DD)"
 fi
 
 if [[ "$msg" == "❌ Hapus" ]]; then
   send_tg "Gunakan:\n/hapus nomor"
+fi
+
+if [[ "$msg" == "📤 Kirim" ]]; then
+  send_tg "Gunakan:\n/kirim pesan"
 fi
 
 # TAMBAH
@@ -80,6 +61,7 @@ if [[ $msg == /tambah* ]]; then
   user=$(echo "$msg" | awk '{print $2}')
   wa=$(echo "$msg" | awk '{print $3}')
   exp=$(echo "$msg" | awk '{print $4}')
+
   echo "$user $wa $exp" >> $DATA
   send_tg "Ditambahkan: $user ($wa)"
 fi
@@ -96,16 +78,24 @@ if [[ $msg == /list ]]; then
   send_tg "$(cat $DATA)"
 fi
 
-# KIRIM WA
+# 🔥 KIRIM KE EXPIRED HARI INI
 if [[ $msg == /kirim* ]]; then
-  user=$(echo "$msg" | awk '{print $2}')
-  wa=$(echo "$msg" | awk '{print $3}')
-  pesan=$(echo "$msg" | cut -d' ' -f4-)
+  text=$(echo "$msg" | cut -d' ' -f2-)
+  today=$(date +"%Y-%m-%d")
 
-  [[ -z "$pesan" ]] && pesan="Halo $user, ini pesan dari bot"
+  jumlah=0
 
-  send_wa "$wa" "$pesan"
-  send_tg "Berhasil kirim ke $user ($wa)"
+  while read user wa exp; do
+    [[ -z "$user" ]] && continue
+
+    if [[ "$exp" == "$today" ]]; then
+      send_wa "$wa" "Halo $user, $text"
+      jumlah=$((jumlah+1))
+    fi
+
+  done < $DATA
+
+  send_tg "✅ Berhasil kirim ke $jumlah user (expired hari ini)"
 fi
 }
 
@@ -118,7 +108,7 @@ while true; do
     update_id=$(echo "$update" | jq '.update_id')
     message=$(echo "$update" | jq -r '.message.text')
 
-    if [[ "$update_id" != "null" ]]; then
+    if [[ "$update_id" != "null" && "$update_id" -ge "$last_update" ]]; then
       last_update=$((update_id+1))
       handle_command "$message"
     fi
@@ -126,19 +116,3 @@ while true; do
 
   sleep 2
 done
-EOF
-
-# inject token
-sed -i "s|__TOKEN__|$TOKEN|g" $HOME/bot-wa/bot.sh
-sed -i "s|__CHAT_ID__|$CHAT_ID|g" $HOME/bot-wa/bot.sh
-sed -i "s|__FONNTE__|$FONNTE|g" $HOME/bot-wa/bot.sh
-
-chmod +x $HOME/bot-wa/bot.sh
-
-echo ""
-echo "================================="
-echo " INSTALL SELESAI (STABLE) ✅"
-echo "================================="
-echo ""
-echo "Jalankan:"
-echo "bash $HOME/bot-wa/bot.sh"
