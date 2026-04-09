@@ -2,19 +2,16 @@
 
 clear
 echo "================================="
-echo " AUTO INSTALL BOT TERMUX 🔥 "
+echo " BOT TERMUX FINAL 🔥 "
 echo "================================="
 
-# AUTO ISI
+# CONFIG (TOKEN KAMU)
 TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
 CHAT_ID="1386780002"
 FONNTE="odCdkwttceRZM4VdaPti"
 
-echo "[INFO] Install dependency..."
 pkg update -y >/dev/null 2>&1
 pkg install -y jq curl >/dev/null 2>&1
-
-echo "[INFO] Setup bot..."
 
 mkdir -p $HOME/bot-wa
 touch $HOME/bot-wa/datauser.txt
@@ -30,19 +27,20 @@ DATA="$HOME/bot-wa/datauser.txt"
 send_tg() {
 curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
 -d chat_id="$CHAT_ID" \
--d text="$1"
+-d text="$1" > /dev/null
 }
 
 send_wa() {
 curl -s -X POST "https://api.fonnte.com/send" \
 -H "Authorization: $FONNTE" \
 -d "target=$1" \
--d "message=$2"
+-d "message=$2" > /dev/null
 }
 
 handle_command() {
 msg="$1"
 
+# TAMBAH USER
 if [[ $msg == /tambah* ]]; then
   user=$(echo "$msg" | awk '{print $2}')
   wa=$(echo "$msg" | awk '{print $3}')
@@ -51,45 +49,34 @@ if [[ $msg == /tambah* ]]; then
   send_tg "Ditambahkan: $user ($wa)"
 fi
 
+# HAPUS USER
 if [[ $msg == /hapus* ]]; then
   wa=$(echo "$msg" | awk '{print $2}')
   sed -i "/$wa/d" $DATA
   send_tg "Dihapus: $wa"
 fi
 
+# LIST USER
 if [[ $msg == /list ]]; then
   send_tg "$(cat $DATA)"
 fi
-}
 
-check_expired() {
-today=$(date +"%Y-%m-%d")
+# 🔥 KIRIM LANGSUNG
+if [[ $msg == /kirim* ]]; then
+  user=$(echo "$msg" | awk '{print $2}')
+  wa=$(echo "$msg" | awk '{print $3}')
+  pesan=$(echo "$msg" | cut -d' ' -f4-)
 
-while read user wa exp; do
-  [[ -z "$user" ]] && continue
+  [[ -z "$pesan" ]] && pesan="Halo $user, ini pesan dari bot"
 
-  if [[ "$exp" == "$today" ]]; then
-    send_wa "$wa" "Halo $user, akun kamu expired hari ini"
-    send_tg "Kirim ke $user"
-  fi
-
-  if [[ "$exp" < "$today" ]]; then
-    sed -i "/$wa/d" $DATA
-  fi
-
-done < $DATA
+  send_wa "$wa" "$pesan"
+  send_tg "Berhasil kirim ke $user ($wa)"
+fi
 }
 
 last_update=0
 
 while true; do
-  hour=$(date +"%H")
-
-  if [[ "$hour" == "18" ]]; then
-    check_expired
-    sleep 3600
-  fi
-
   response=$(curl -s --max-time 10 "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
 
   [[ -z "$response" ]] && sleep 5 && continue
