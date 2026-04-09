@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-TOKEN="__TOKEN__"
-CHAT_ID="__CHAT_ID__"
-FONNTE="__FONNTE__"
+TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
+CHAT_ID="1386780002"
+FONNTE="odCdkwttceRZM4VdaPti"
 
 DATA="$HOME/datauser.txt"
 OFFSET_FILE="$HOME/offset.txt"
