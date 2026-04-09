@@ -1,9 +1,15 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-TOKEN="__TOKEN__"
-CHAT_ID="__CHAT_ID__"
-FONNTE="__FONNTE__"
+# ================= CONFIG =================
+TOKEN="8290196740:AAGAMlvolfPinlOIQMkrgsB1kgOjtSBU0zc"
+CHAT_ID="1386780002"
+FONNTE="odCdkwttceRZM4VdaPti"
 DATA="$HOME/bot-wa/datauser.txt"
+
+mkdir -p $HOME/bot-wa
+touch $DATA
+
+# ================= FUNCTION =================
 
 send_tg() {
 curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
@@ -14,7 +20,12 @@ curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
 send_menu() {
 curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
 -d chat_id="$CHAT_ID" \
--d text="🤖 MENU BOT\nPilih menu:" \
+-d text="🤖 MENU BOT
+
+➕ Tambah
+📋 List
+📤 Kirim (Expired Hari Ini)
+❌ Hapus" \
 -d reply_markup='{
   "keyboard":[
     ["➕ Tambah","📋 List"],
@@ -31,6 +42,8 @@ curl -s -X POST "https://api.fonnte.com/send" \
 -d "message=$2" > /dev/null
 }
 
+# ================= COMMAND =================
+
 handle_command() {
 msg="$1"
 
@@ -41,11 +54,21 @@ fi
 
 # MENU BUTTON
 if [[ "$msg" == "📋 List" ]]; then
-  send_tg "$(cat $DATA)"
+  if [[ ! -s $DATA ]]; then
+    send_tg "📭 Data kosong"
+  else
+    no=1
+    text="📋 DATA USER:\n"
+    while read user wa exp; do
+      text+="\n$no. $user\n📱 $wa\n📅 Exp: $exp\n"
+      no=$((no+1))
+    done < $DATA
+    send_tg "$text"
+  fi
 fi
 
 if [[ "$msg" == "➕ Tambah" ]]; then
-  send_tg "Gunakan:\n/tambah nama nomor tanggal(YYYY-MM-DD)"
+  send_tg "Gunakan:\n/tambah nama nomor tanggal\n\nContoh:\n/tambah budi 628xxxx 2026-04-10"
 fi
 
 if [[ "$msg" == "❌ Hapus" ]]; then
@@ -62,26 +85,41 @@ if [[ $msg == /tambah* ]]; then
   wa=$(echo "$msg" | awk '{print $3}')
   exp=$(echo "$msg" | awk '{print $4}')
 
+  if [[ -z "$user" || -z "$wa" || -z "$exp" ]]; then
+    send_tg "❌ Format salah!\n/tambah nama nomor tanggal"
+    return
+  fi
+
   echo "$user $wa $exp" >> $DATA
-  send_tg "Ditambahkan: $user ($wa)"
+  send_tg "✅ Ditambahkan: $user ($wa)"
 fi
 
 # HAPUS
 if [[ $msg == /hapus* ]]; then
   wa=$(echo "$msg" | awk '{print $2}')
-  sed -i "/$wa/d" $DATA
-  send_tg "Dihapus: $wa"
+
+  if grep -q "$wa" $DATA; then
+    sed -i "/$wa/d" $DATA
+    send_tg "❌ Dihapus: $wa"
+  else
+    send_tg "⚠️ Nomor tidak ditemukan"
+  fi
 fi
 
-# LIST
+# LIST COMMAND
 if [[ $msg == /list ]]; then
-  send_tg "$(cat $DATA)"
+  handle_command "📋 List"
 fi
 
-# 🔥 KIRIM KE EXPIRED HARI INI
+# ================= KIRIM EXPIRED =================
 if [[ $msg == /kirim* ]]; then
   text=$(echo "$msg" | cut -d' ' -f2-)
   today=$(date +"%Y-%m-%d")
+
+  if [[ -z "$text" ]]; then
+    send_tg "❌ Masukkan pesan!\n/kirim pesan"
+    return
+  fi
 
   jumlah=0
 
@@ -89,15 +127,18 @@ if [[ $msg == /kirim* ]]; then
     [[ -z "$user" ]] && continue
 
     if [[ "$exp" == "$today" ]]; then
-      send_wa "$wa" "Halo $user, $text"
+      send_wa "$wa" "⚠️ NOTIF\nHalo $user,\n$text"
       jumlah=$((jumlah+1))
     fi
 
   done < $DATA
 
-  send_tg "✅ Berhasil kirim ke $jumlah user (expired hari ini)"
+  send_tg "✅ Berhasil kirim ke $jumlah user hari ini"
 fi
+
 }
+
+# ================= LOOP =================
 
 last_update=0
 
