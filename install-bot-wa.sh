@@ -7,9 +7,11 @@ FONNTE="odCdkwttceRZM4VdaPti"
 
 DATA="$HOME/datauser.txt"
 STATE="$HOME/state.txt"
+OFFSET_FILE="$HOME/offset.txt"
 
 touch $DATA
 touch $STATE
+touch $OFFSET_FILE
 
 send_tg() {
 curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
@@ -42,13 +44,10 @@ curl -s -X POST "https://api.fonnte.com/send" \
 -d "message=$2" > /dev/null
 }
 
-set_state() {
-echo "$1" > $STATE
-}
+set_state() { echo "$1" > $STATE; }
+get_state() { cat $STATE; }
 
-get_state() {
-cat $STATE
-}
+# ================= COMMAND =================
 
 handle_command() {
 msg="$1"
@@ -63,98 +62,76 @@ if [[ "$msg" == "/start" ]]; then
   return
 fi
 
-# ================= TAMBAH INTERAKTIF =================
-
+# TAMBAH
 if [[ "$msg" == "➕ Tambah" ]]; then
   send_tg "Masukkan nama:"
-  set_state "tambah_nama"
+  set_state "nama"
   return
 fi
 
-if [[ "$state" == "tambah_nama" ]]; then
-  echo "$msg" > $HOME/tmp_nama
-  send_tg "Masukkan nomor (contoh 628xxx):"
-  set_state "tambah_nomor"
+if [[ "$state" == "nama" ]]; then
+  echo "$msg" > $HOME/nama
+  send_tg "Masukkan nomor:"
+  set_state "nomor"
   return
 fi
 
-if [[ "$state" == "tambah_nomor" ]]; then
-  echo "$msg" > $HOME/tmp_nomor
-  send_tg "Masukkan tanggal expired (YYYY-MM-DD):"
-  set_state "tambah_exp"
+if [[ "$state" == "nomor" ]]; then
+  echo "$msg" > $HOME/nomor
+  send_tg "Masukkan tanggal (YYYY-MM-DD):"
+  set_state "exp"
   return
 fi
 
-if [[ "$state" == "tambah_exp" ]]; then
-  nama=$(cat $HOME/tmp_nama)
-  nomor=$(cat $HOME/tmp_nomor)
-  exp="$msg"
+if [[ "$state" == "exp" ]]; then
+  nama=$(cat $HOME/nama)
+  nomor=$(cat $HOME/nomor)
 
-  echo "$nama $nomor $exp" >> $DATA
-  send_tg "✅ Berhasil ditambahkan:\n$nama ($nomor)\nExp: $exp"
-
+  echo "$nama $nomor $msg" >> $DATA
+  send_tg "✅ Ditambahkan: $nama ($nomor)"
   set_state "idle"
   return
 fi
 
-# ================= LIST =================
-
+# LIST
 if [[ "$msg" == "📋 List" ]]; then
-  if [[ ! -s $DATA ]]; then
-    send_tg "📭 Data kosong"
-  else
-    no=1
-    text="📋 DATA USER:\n"
-    while read user wa exp; do
-      text+="\n$no. $user\n📱 $wa\n📅 Exp: $exp\n"
-      no=$((no+1))
-    done < $DATA
-    send_tg "$text"
-  fi
+  text="📋 DATA:\n"
+  while read u w e; do
+    text+="\n$u | $w | $e"
+  done < $DATA
+  send_tg "$text"
   return
 fi
 
-# ================= KIRIM INTERAKTIF =================
-
+# KIRIM
 if [[ "$msg" == "📤 Kirim" ]]; then
-  send_tg "Masukkan pesan yang ingin dikirim:"
-  set_state "kirim_pesan"
+  send_tg "Masukkan pesan:"
+  set_state "kirim"
   return
 fi
 
-if [[ "$state" == "kirim_pesan" ]]; then
-  text="$msg"
+if [[ "$state" == "kirim" ]]; then
   jumlah=0
-
-  while read user wa exp; do
-    [[ -z "$user" ]] && continue
-    send_wa "$wa" "📢 INFO\n$text"
+  while read u w e; do
+    send_wa "$w" "$msg"
     jumlah=$((jumlah+1))
   done < $DATA
 
-  send_tg "✅ Pesan terkirim ke $jumlah user"
+  send_tg "✅ Terkirim ke $jumlah user"
   set_state "idle"
   return
 fi
 
-# ================= HAPUS =================
-
+# HAPUS
 if [[ "$msg" == "❌ Hapus" ]]; then
-  send_tg "Masukkan nomor yang mau dihapus:"
+  send_tg "Masukkan nomor:"
   set_state "hapus"
   return
 fi
 
 if [[ "$state" == "hapus" ]]; then
-  wa="$msg"
-
-  if grep -q "$wa" $DATA; then
-    sed -i "/$wa/d" $DATA
-    send_tg "❌ Dihapus: $wa"
-  else
-    send_tg "⚠️ Tidak ditemukan"
-  fi
-
+  sed -i "/$msg/d" $DATA
+  send_tg "❌ Dihapus"
   set_state "idle"
   return
 fi
@@ -163,23 +140,21 @@ fi
 
 # ================= LOOP =================
 
-last_update=0
+last_update=$(cat $OFFSET_FILE)
 
 while true; do
   response=$(curl -s "https://api.telegram.org/bot$TOKEN/getUpdates?offset=$last_update")
 
-  updates=$(echo "$response" | jq -c '.result[]?')
-
-  for update in $updates; do
+  echo "$response" | jq -c '.result[]?' | while read update; do
     update_id=$(echo "$update" | jq '.update_id')
     message=$(echo "$update" | jq -r '.message.text // empty')
 
     [[ -z "$message" ]] && continue
 
-    if (( update_id >= last_update )); then
-      last_update=$((update_id+1))
-      handle_command "$message"
-    fi
+    last_update=$((update_id+1))
+    echo "$last_update" > $OFFSET_FILE
+
+    handle_command "$message"
   done
 
   sleep 2
