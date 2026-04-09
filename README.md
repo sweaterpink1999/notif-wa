@@ -1,31 +1,63 @@
-# 🤖 BOT TAGIHAN WA + TELEGRAM
+# 🤖 BOT TAGIHAN WA + TELEGRAM (TERMUX VERSION)
 
 Bot otomatis untuk:
 
 * Kirim tagihan WhatsApp (via Fonnte)
 * Kontrol via Telegram
 * Auto kirim jam 18:00
-* Auto hapus user yang expired
+* Auto hapus user expired
+* Jalan di Termux (HP) ✅
 
 ---
 
-## 🚀 INSTALL (AUTO)
+## 🚀 INSTALL (AUTO TERMUX)
 
-Jalankan di VPS:
+Copy–paste ini di Termux:
 
 ```bash
-wget https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh && bash install-bot-wa.sh
+pkg update -y && pkg install -y curl jq wget tmux && \
+wget -O install-bot-wa.sh https://raw.githubusercontent.com/sweaterpink1999/notif-wa/main/install-bot-wa.sh && \
+sed -i 's|/root|$HOME|g' install-bot-wa.sh && \
+sed -i '/systemctl/d' install-bot-wa.sh && \
+sed -i 's|apt |pkg |g' install-bot-wa.sh && \
+sed -i 's|/bin/bash|/data/data/com.termux/files/usr/bin/bash|g' install-bot-wa.sh && \
+bash install-bot-wa.sh
 ```
 
 ---
 
-## 🔑 YANG DIBUTUHKAN
+## ▶️ JALANKAN BOT
 
-Saat install, masukkan:
+```bash
+bash $HOME/bot-wa/bot.sh
+```
 
-* Token Telegram Bot
-* Chat ID Telegram
-* Token Fonnte
+---
+
+## 🔥 JALANIN DI BACKGROUND (WAJIB)
+
+```bash
+tmux
+bash $HOME/bot-wa/bot.sh
+```
+
+Keluar tanpa matikan bot:
+
+```
+CTRL + B lalu tekan D
+```
+
+---
+
+## 🔑 CONFIG
+
+Bot sudah otomatis pakai:
+
+* TOKEN TELEGRAM ✅
+* CHAT ID ✅
+* TOKEN FONNTE ✅
+
+(Tidak perlu input manual)
 
 ---
 
@@ -33,13 +65,13 @@ Saat install, masukkan:
 
 ### ➕ Tambah User
 
-```bash
+```
 /tambah nama 628xxxx 2026-04-09
 ```
 
 Contoh:
 
-```bash
+```
 /tambah user1 628123456789 2026-04-09
 ```
 
@@ -47,7 +79,7 @@ Contoh:
 
 ### ❌ Hapus User
 
-```bash
+```
 /hapus 628xxxx
 ```
 
@@ -55,7 +87,7 @@ Contoh:
 
 ### 📋 List User
 
-```bash
+```
 /list
 ```
 
@@ -63,48 +95,41 @@ Contoh:
 
 ## ⏰ AUTO SYSTEM
 
-Bot akan otomatis:
+Bot otomatis:
 
 * Kirim WhatsApp jam **18:00**
-* Hanya kirim jika tanggal **sesuai**
-* Tidak kirim jika belum tanggal
-* Hapus user jika sudah **lewat tanggal**
+* Hanya kirim jika tanggal sesuai
+* Tidak kirim sebelum waktunya
+* Hapus user jika sudah lewat tanggal
 
 ---
 
 ## 📦 FORMAT DATA
 
-```text
+```
 nama nomor tanggal_expired
 ```
 
 Contoh:
 
-```text
+```
 user1 628123456789 2026-04-09
 ```
 
 ---
 
-## ⚙️ SERVICE
+## ⚠️ CATATAN
 
-Cek status bot:
+* Format nomor WA:
 
-```bash
-systemctl status bot-wa
+```
+628xxxx (tanpa 0)
 ```
 
-Restart bot:
+* Pastikan:
 
-```bash
-systemctl restart bot-wa
-```
-
-Stop bot:
-
-```bash
-systemctl stop bot-wa
-```
+  * Bot Telegram sudah klik **START**
+  * Fonnte masih aktif / connected
 
 ---
 
@@ -113,23 +138,23 @@ systemctl stop bot-wa
 * ✔ Kirim WA otomatis
 * ✔ Kontrol via Telegram
 * ✔ Auto delete expired user
-* ✔ Auto running (systemd)
-* ✔ Tidak perlu VPS mahal
+* ✔ Anti stuck (timeout fix)
+* ✔ Tidak perlu VPS
+* ✔ Jalan di HP (Termux)
 
 ---
 
-## ⚠️ CATATAN
+## 💥 TIPS
 
-* Nomor WA harus format:
+Kalau bot berhenti:
 
+```bash
+bash $HOME/bot-wa/bot.sh
 ```
-628xxxx (tanpa 0)
-```
-
-* Pastikan WhatsApp (Fonnte) tetap connected
 
 ---
 
 ## 👨‍💻 AUTHOR
 
 By: kamu sendiri 😎
+Upgrade: versi Termux Anti Stuck 🔥
