@@ -5,8 +5,8 @@ echo "================================="
 echo " AUTO INSTALL BOT TAGIHAN PRO "
 echo "================================="
 
-apt update -y &>/dev/null
-apt install curl jq nano -y &>/dev/null
+apt update -y
+apt install curl jq nano -y
 
 read -p "TOKEN TELEGRAM: " TOKEN
 read -p "CHAT ID TELEGRAM: " CHAT_ID
@@ -15,12 +15,12 @@ read -p "TOKEN FONNTE: " FONNTE
 mkdir -p /root/bot-wa
 touch /root/bot-wa/datauser.txt
 
-cat > /root/bot-wa/bot.sh <<EOF
+cat > /root/bot-wa/bot.sh << 'EOF'
 #!/bin/bash
 
-TOKEN="$TOKEN"
-CHAT_ID="$CHAT_ID"
-FONNTE="$FONNTE"
+TOKEN="__TOKEN__"
+CHAT_ID="__CHAT_ID__"
+FONNTE="__FONNTE__"
 DATA="/root/bot-wa/datauser.txt"
 
 send_tg() {
@@ -40,22 +40,22 @@ handle_command() {
 msg="$1"
 
 if [[ $msg == /tambah* ]]; then
-  user=$(echo $msg | awk '{print $2}')
-  wa=$(echo $msg | awk '{print $3}')
-  exp=$(echo $msg | awk '{print $4}')
+  user=$(echo "$msg" | awk '{print $2}')
+  wa=$(echo "$msg" | awk '{print $3}')
+  exp=$(echo "$msg" | awk '{print $4}')
   echo "$user $wa $exp" >> $DATA
-  send_tg "✅ Ditambahkan: $user ($wa) exp $exp"
+  send_tg "Ditambahkan: $user ($wa) exp $exp"
 fi
 
 if [[ $msg == /hapus* ]]; then
-  wa=$(echo $msg | awk '{print $2}')
+  wa=$(echo "$msg" | awk '{print $2}')
   sed -i "/$wa/d" $DATA
-  send_tg "❌ Dihapus nomor: $wa"
+  send_tg "Dihapus nomor: $wa"
 fi
 
 if [[ $msg == /list ]]; then
   list=$(cat $DATA)
-  send_tg "📋 DATA USER:\n$list"
+  send_tg "DATA USER:\n$list"
 fi
 }
 
@@ -66,13 +66,13 @@ while read user wa exp; do
   [[ -z "$user" ]] && continue
 
   if [[ "$exp" == "$today" ]]; then
-    send_wa "$wa" "Halo $user, akun kamu hari ini expired. Silahkan perpanjang 🙏"
-    send_tg "📤 WA terkirim ke $user ($wa)"
+    send_wa "$wa" "Halo $user, akun kamu hari ini expired. Silahkan perpanjang"
+    send_tg "WA terkirim ke $user ($wa)"
   fi
 
   if [[ "$exp" < "$today" ]]; then
     sed -i "/$wa/d" $DATA
-    send_tg "🗑️ Dihapus (expired lewat): $user ($wa)"
+    send_tg "Dihapus expired: $user ($wa)"
   fi
 
 done < $DATA
@@ -101,6 +101,11 @@ while true; do
 done
 EOF
 
+# Replace placeholder dengan input
+sed -i "s|__TOKEN__|$TOKEN|g" /root/bot-wa/bot.sh
+sed -i "s|__CHAT_ID__|$CHAT_ID|g" /root/bot-wa/bot.sh
+sed -i "s|__FONNTE__|$FONNTE|g" /root/bot-wa/bot.sh
+
 chmod +x /root/bot-wa/bot.sh
 
 cat > /etc/systemd/system/bot-wa.service <<EOF
@@ -118,7 +123,7 @@ EOF
 
 systemctl daemon-reload
 systemctl enable bot-wa
-systemctl start bot-wa
+systemctl restart bot-wa
 
 echo ""
 echo "INSTALL SELESAI"
