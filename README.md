@@ -10,9 +10,48 @@ Bot otomatis untuk:
 
 ---
 
-## 🚀 INSTALL (AUTO TERMUX)
+# 🚀 1. INSTALL TERMUX (WAJIB)
 
-Copy–paste ini di Termux:
+❗ **Jangan pakai Termux dari Play Store**
+
+Download dari sini:
+👉 https://f-droid.org/packages/com.termux/
+
+---
+
+# ⚙️ 2. SETUP AWAL TERMUX
+
+Buka Termux lalu jalankan:
+
+```bash
+termux-change-repo
+```
+
+Pilih:
+
+* ✔ Mirror group
+* ✔ Main repository
+* ✔ Pilih mirror:
+
+  * Grimler (Singapore) ✅
+  * Cloudflare ✅
+
+❌ Jangan pilih textcord
+
+---
+
+# 🔄 3. UPDATE & INSTALL DEPENDENCY
+
+```bash
+pkg update -y && pkg upgrade -y
+pkg install curl jq wget tmux -y
+```
+
+---
+
+# 🚀 4. INSTALL BOT (AUTO)
+
+Copy–paste ini:
 
 ```bash
 pkg update -y && pkg install -y curl jq wget tmux && \
@@ -26,7 +65,7 @@ bash install-bot-wa.sh
 
 ---
 
-## ▶️ JALANKAN BOT
+# ▶️ 5. JALANKAN BOT
 
 ```bash
 bash $HOME/bot-wa/bot.sh
@@ -34,24 +73,30 @@ bash $HOME/bot-wa/bot.sh
 
 ---
 
-## 🔥 JALANIN DI BACKGROUND (WAJIB)
+# 🔥 6. JALANKAN DI BACKGROUND (WAJIB)
 
 ```bash
 tmux
 bash $HOME/bot-wa/bot.sh
 ```
 
-Keluar tanpa matikan bot:
+Keluar tanpa mematikan bot:
 
 ```
 CTRL + B lalu tekan D
 ```
 
+Masuk kembali:
+
+```bash
+tmux attach
+```
+
 ---
 
-## 🔑 CONFIG
+# 🔑 CONFIG
 
-Bot sudah otomatis pakai:
+Bot sudah otomatis menggunakan:
 
 * TOKEN TELEGRAM ✅
 * CHAT ID ✅
@@ -61,7 +106,7 @@ Bot sudah otomatis pakai:
 
 ---
 
-## 📲 CARA PAKAI BOT
+# 📲 CARA PAKAI BOT
 
 ### ➕ Tambah User
 
@@ -93,9 +138,9 @@ Contoh:
 
 ---
 
-## ⏰ AUTO SYSTEM
+# ⏰ AUTO SYSTEM
 
-Bot otomatis:
+Bot akan otomatis:
 
 * Kirim WhatsApp jam **18:00**
 * Hanya kirim jika tanggal sesuai
@@ -104,7 +149,7 @@ Bot otomatis:
 
 ---
 
-## 📦 FORMAT DATA
+# 📦 FORMAT DATA
 
 ```
 nama nomor tanggal_expired
@@ -118,7 +163,7 @@ user1 628123456789 2026-04-09
 
 ---
 
-## ⚠️ CATATAN
+# ⚠️ CATATAN PENTING
 
 * Format nomor WA:
 
@@ -129,24 +174,35 @@ user1 628123456789 2026-04-09
 * Pastikan:
 
   * Bot Telegram sudah klik **START**
-  * Fonnte masih aktif / connected
+  * Fonnte dalam kondisi **connected**
 
 ---
 
-## 🔥 FITUR
+# 🔥 FITUR
 
 * ✔ Kirim WA otomatis
 * ✔ Kontrol via Telegram
 * ✔ Auto delete expired user
-* ✔ Anti stuck (timeout fix)
+* ✔ Anti stuck (pakai timeout)
 * ✔ Tidak perlu VPS
 * ✔ Jalan di HP (Termux)
 
 ---
 
-## 💥 TIPS
+# 💥 TROUBLESHOOTING
 
-Kalau bot berhenti:
+### Bot tidak respon
+
+* Pastikan sudah klik **START** di Telegram
+
+### WA tidak terkirim
+
+* Cek token Fonnte
+* Cek nomor format 628xxxx
+
+### Bot berhenti
+
+Jalankan ulang:
 
 ```bash
 bash $HOME/bot-wa/bot.sh
@@ -154,7 +210,7 @@ bash $HOME/bot-wa/bot.sh
 
 ---
 
-## 👨‍💻 AUTHOR
+# 👨‍💻 AUTHOR
 
 By: kamu sendiri 😎
-Upgrade: versi Termux Anti Stuck 🔥
+Upgrade: Termux Version Anti Stuck 🔥
